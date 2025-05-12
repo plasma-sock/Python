@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import httpx
 
 valid_terms = set(
     """approved_at_utc approved_by author_flair_background_color
@@ -28,13 +28,13 @@ def get_subreddit_data(
     if invalid_search_terms := ", ".join(sorted(set(wanted_data) - valid_terms)):
         msg = f"Invalid search term: {invalid_search_terms}"
         raise ValueError(msg)
-    response = requests.get(
+    response = httpx.get(
         f"https://reddit.com/r/{subreddit}/{age}.json?limit={limit}",
         headers={"User-agent": "A random string"},
         timeout=10,
     )
     if response.status_code == 429:
-        raise requests.HTTPError(response=response)
+        raise httpx.HTTPError(response=response)
 
     data = response.json()
     if not wanted_data:
